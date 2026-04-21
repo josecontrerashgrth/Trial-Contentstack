@@ -135,8 +135,8 @@ export type ImageTextBlock = Block;
 
 export interface FeaturesBlock {
   section_title?: string;
-  /** Modular blocks sub-field; reuses the existing Blocks/Block shape. */
-  cards?: Blocks[];
+  /** Group field (array plano, sin wrapper `block`) */
+  cards?: Block[];
   _metadata?: { uid: string };
   $?: {
     section_title?: CSLPFieldMapping;

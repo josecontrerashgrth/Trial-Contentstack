@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { Blocks, CSLPFieldMapping } from "@/lib/types";
+import { Block, CSLPFieldMapping } from "@/lib/types";
 import { VB_EmptyBlockParentClass } from "@contentstack/live-preview-utils";
 
 interface FeaturesSectionProps {
-    blocks?: Blocks[];
+    blocks?: Block[];
     /** CSLP del campo contenedor (p.ej. `page?.$?.blocks` o `block?.$?.cards`). */
     containerCslp?: CSLPFieldMapping;
     /** Devuelve el CSLP de cada tarjeta por índice. */
@@ -33,9 +33,7 @@ export default function FeaturesSection({
                     }`}
                 {...(containerCslp ?? {})}
             >
-                {blocks?.map((item, index) => {
-                    const { block } = item;
-
+                {blocks?.map((block, index) => {
                     return (
                         <div
                             key={block._metadata?.uid ?? `feature-${index}`}
