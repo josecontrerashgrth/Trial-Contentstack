@@ -2,6 +2,7 @@ import { Page } from "@/lib/types";
 import HeroSection from "@/components/sections/HeroSection";
 import RichTextSection from "@/components/sections/RichTextSection";
 import BlocksSection from "@/components/sections/BlocksSection";
+import SectionRenderer from "@/components/sections/SectionRenderer";
 
 interface ContentDisplayProps {
   page: Page | undefined;
@@ -10,31 +11,39 @@ interface ContentDisplayProps {
 /**
  * Page (ContentDisplay) – orquesta las secciones de una página de Contentstack.
  *
- * Estructura:
- *   1. HeroSection   → título, descripción e imagen principal
- *   2. RichTextSection → contenido HTML enriquecido
- *   3. BlocksSection   → modular blocks (imagen + texto, layout configurable)
+ * Tiene dos modos de construcción de página:
  *
- * Para añadir una nueva sección:
- *   1. Crea el componente en components/sections/
- *   2. Impórtalo aquí y añádelo al JSX pasándole los campos de `page` que necesite.
+ * 1. Campos fijos del content type `page`:
+ *    - HeroSection    → title, description, image
+ *    - RichTextSection → rich_text
+ *    - BlocksSection   → blocks (modular, imagen+texto)
  *
- * Todos los atributos CSLP (page.$.*) se pasan a cada sección para que
- * Contentstack Live Preview / Visual Builder pueda detectar los campos editables.
+ * 2. Campo `sections` (page builder modular):
+ *    - SectionRenderer dispatchea por block type UID.
+ *    - Añadir una nueva sección: crear el block type en Contentstack,
+ *      añadir la interfaz en lib/types.ts y el `if` en SectionRenderer.
  */
 export default function ContentDisplay({ page }: ContentDisplayProps) {
   return (
     <main>
+      {/* ── Campos fijos ─────────────────────────────────────────── */}
       <HeroSection
         title={page?.title}
         description={page?.description}
         image={page?.image ?? undefined}
-        cslp={page?.$}
+        cslp={{ title: page?.$?.title, description: page?.$?.description }}
       />
 
-      <RichTextSection html={page?.rich_text} cslp={page?.$} />
+      <RichTextSection html={page?.rich_text} cslp={page?.$?.rich_text} />
 
-      <BlocksSection blocks={page?.blocks} cslp={page?.$} />
+      <BlocksSection
+        blocks={page?.blocks}
+        containerCslp={page?.$?.blocks}
+        getItemCslp={(i) => page?.$?.[`blocks__${i}`]}
+      />
+
+      {/* ── Secciones modulares (page builder) ───────────────────── */}
+      <SectionRenderer sections={page?.sections} pageCslp={page?.$} />
     </main>
   );
 }

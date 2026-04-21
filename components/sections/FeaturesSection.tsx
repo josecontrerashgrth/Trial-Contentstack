@@ -1,10 +1,13 @@
 import Image from "next/image";
-import { Blocks, Page } from "@/lib/types";
+import { Blocks, CSLPFieldMapping } from "@/lib/types";
 import { VB_EmptyBlockParentClass } from "@contentstack/live-preview-utils";
 
 interface FeaturesSectionProps {
     blocks?: Blocks[];
-    cslp?: Page["$"];
+    /** CSLP del campo contenedor (p.ej. `page?.$?.blocks` o `block?.$?.cards`). */
+    containerCslp?: CSLPFieldMapping;
+    /** Devuelve el CSLP de cada tarjeta por índice. */
+    getItemCslp?: (index: number) => CSLPFieldMapping | undefined;
     title?: string;
 }
 
@@ -15,7 +18,8 @@ interface FeaturesSectionProps {
  */
 export default function FeaturesSection({
     blocks,
-    cslp,
+    containerCslp,
+    getItemCslp,
     title,
 }: FeaturesSectionProps) {
     return (
@@ -27,7 +31,7 @@ export default function FeaturesSection({
             <div
                 className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto ${!blocks || blocks.length === 0 ? VB_EmptyBlockParentClass : ""
                     }`}
-                {...(cslp?.blocks ?? {})}
+                {...(containerCslp ?? {})}
             >
                 {blocks?.map((item, index) => {
                     const { block } = item;
@@ -35,7 +39,7 @@ export default function FeaturesSection({
                     return (
                         <div
                             key={block._metadata?.uid ?? `feature-${index}`}
-                            {...(cslp?.[`blocks__${index}`] ?? {})}
+                            {...(getItemCslp?.(index) ?? {})}
                             className="flex flex-col gap-4 bg-white border border-gray-100 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow"
                         >
                             {block.image && (

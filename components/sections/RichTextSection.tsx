@@ -1,9 +1,10 @@
-import { Page } from "@/lib/types";
+import { CSLPFieldMapping } from "@/lib/types";
 import RichText from "@/components/ui/RichText";
 
 interface RichTextSectionProps {
     html?: string;
-    cslp?: Page["$"];
+    /** Pasar directamente el CSLPFieldMapping del campo (p.ej. `page?.$?.rich_text` o `block?.$?.content`). */
+    cslp?: CSLPFieldMapping;
 }
 
 /**
@@ -18,7 +19,7 @@ export default function RichTextSection({ html, cslp }: RichTextSectionProps) {
             <RichText
                 html={html}
                 className="prose prose-lg mx-auto"
-                cslp={cslp?.rich_text}
+                cslp={cslp}
             />
         </section>
     );

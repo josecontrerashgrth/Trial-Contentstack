@@ -1,11 +1,14 @@
 import Image from "next/image";
-import { Blocks, Page } from "@/lib/types";
+import { Blocks, CSLPFieldMapping } from "@/lib/types";
 import { VB_EmptyBlockParentClass } from "@contentstack/live-preview-utils";
 import RichText from "@/components/ui/RichText";
 
 interface BlocksSectionProps {
     blocks?: Blocks[];
-    cslp?: Page["$"];
+    /** CSLP del campo contenedor (p.ej. `page?.$?.blocks`). */
+    containerCslp?: CSLPFieldMapping;
+    /** Devuelve el CSLP de cada item por índice (p.ej. `page?.$?.[\`blocks__${i}\`]`). */
+    getItemCslp?: (index: number) => CSLPFieldMapping | undefined;
 }
 
 /**
@@ -13,12 +16,12 @@ interface BlocksSectionProps {
  * Cada bloque puede mostrar una imagen a la izquierda o derecha según el campo `layout`.
  * Soporta atributos CSLP para edición en Visual Builder.
  */
-export default function BlocksSection({ blocks, cslp }: BlocksSectionProps) {
+export default function BlocksSection({ blocks, containerCslp, getItemCslp }: BlocksSectionProps) {
     return (
         <section
             className={`space-y-8 max-w-full py-8 px-4 ${!blocks || blocks.length === 0 ? VB_EmptyBlockParentClass : ""
                 }`}
-            {...(cslp?.blocks ?? {})}
+            {...(containerCslp ?? {})}
         >
             {blocks?.map((item, index) => {
                 const { block } = item;
@@ -27,7 +30,7 @@ export default function BlocksSection({ blocks, cslp }: BlocksSectionProps) {
                 return (
                     <div
                         key={block._metadata?.uid ?? `block-${index}`}
-                        {...(cslp?.[`blocks__${index}`] ?? {})}
+                        {...(getItemCslp?.(index) ?? {})}
                         className={`flex flex-col md:flex-row items-center gap-6 bg-white rounded-xl shadow-sm p-6 ${isImageLeft ? "md:flex-row" : "md:flex-row-reverse"
                             }`}
                     >

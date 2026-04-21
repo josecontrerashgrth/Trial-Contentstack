@@ -1,12 +1,16 @@
 import Image from "next/image";
-import { Page } from "@/lib/types";
+import { CSLPFieldMapping, File } from "@/lib/types";
 import Button from "@/components/ui/Button";
 
 interface HeroSectionProps {
     title?: string;
     description?: string;
-    image?: Page["image"];
-    cslp?: Page["$"];
+    image?: File | null;
+    /** CSLP field bindings – pass the block's own `$` object. */
+    cslp?: {
+        title?: CSLPFieldMapping;
+        description?: CSLPFieldMapping;
+    };
     ctaLabel?: string;
     ctaHref?: string;
 }

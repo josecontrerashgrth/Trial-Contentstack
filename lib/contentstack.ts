@@ -1,22 +1,30 @@
 // Importing Contentstack SDK and specific types for region and query operations
 import contentstack, { QueryOperation } from "@contentstack/delivery-sdk";
 
-// Importing Contentstack Live Preview utilities and stack SDK 
-import ContentstackLivePreview, { IStackSdk } from "@contentstack/live-preview-utils";
+// Importing Contentstack Live Preview utilities and stack SDK
+import ContentstackLivePreview, {
+  IStackSdk,
+} from "@contentstack/live-preview-utils";
 
-// Importing the Page type definition 
+// Importing the Page type definition
 import { Page } from "./types";
 
 // helper functions from private package to retrieve Contentstack endpoints in a convienient way
-import { getContentstackEndpoints, getRegionForString } from "@timbenniks/contentstack-endpoints";
+import {
+  getContentstackEndpoints,
+  getRegionForString,
+} from "@timbenniks/contentstack-endpoints";
 
-export const isPreview = process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === "true";
+export const isPreview =
+  process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === "true";
 
 // Set the region by string value from environment variables
-const region = getRegionForString(process.env.NEXT_PUBLIC_CONTENTSTACK_REGION as string)
+const region = getRegionForString(
+  process.env.NEXT_PUBLIC_CONTENTSTACK_REGION as string,
+);
 
 // object with all endpoints for region.
-const endpoints = getContentstackEndpoints(region, true)
+const endpoints = getContentstackEndpoints(region, true);
 
 export const stack = contentstack.stack({
   // Setting the API key from environment variables
@@ -31,30 +39,36 @@ export const stack = contentstack.stack({
   // Setting the region
   // if the region doesnt exist, fall back to a custom region given by the env vars
   // for internal testing purposes at Contentstack we look for a custom region in the env vars, you do not have to do this.
-  region: region ? region : process.env.NEXT_PUBLIC_CONTENTSTACK_REGION as any,
+  region: region
+    ? region
+    : (process.env.NEXT_PUBLIC_CONTENTSTACK_REGION as any),
 
   // Setting the host for content delivery based on the region or environment variables
   // This is done for internal testing purposes at Contentstack, you can omit this if you have set a region above.
-  host: process.env.NEXT_PUBLIC_CONTENTSTACK_CONTENT_DELIVERY || endpoints && endpoints.contentDelivery,
+  host:
+    process.env.NEXT_PUBLIC_CONTENTSTACK_CONTENT_DELIVERY ||
+    (endpoints && endpoints.contentDelivery),
 
   live_preview: {
     // Enabling live preview if specified in environment variables
-    enable: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === 'true',
+    enable: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === "true",
 
     // Setting the preview token from environment variables
     preview_token: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW_TOKEN,
 
     // Setting the host for live preview based on the region
     // for internal testing purposes at Contentstack we look for a custom host in the env vars, you do not have to do this.
-    host: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW_HOST || endpoints && endpoints.preview
-  }
+    host:
+      process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW_HOST ||
+      (endpoints && endpoints.preview),
+  },
 });
 
 // Initialize live preview functionality
 export function initLivePreview() {
   ContentstackLivePreview.init({
     ssr: false, // Disabling server-side rendering for live preview
-    enable: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === 'true', // Enabling live preview if specified in environment variables
+    enable: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW === "true", // Enabling live preview if specified in environment variables
     mode: "builder", // Setting the mode to "builder" for visual builder
     stackSdk: stack.config as IStackSdk, // Passing the stack configuration
     stackDetails: {
@@ -64,11 +78,13 @@ export function initLivePreview() {
     clientUrlParams: {
       // Setting the client URL parameters for live preview
       // for internal testing purposes at Contentstack we look for a custom host in the env vars, you do not have to do this.
-      host: process.env.NEXT_PUBLIC_CONTENTSTACK_CONTENT_APPLICATION || endpoints && endpoints.application
+      host:
+        process.env.NEXT_PUBLIC_CONTENTSTACK_CONTENT_APPLICATION ||
+        (endpoints && endpoints.application),
     },
     editButton: {
       enable: true, // Enabling the edit button for live preview
-      exclude: ["outsideLivePreviewPortal"] // Excluding the edit button from the live preview portal
+      exclude: ["outsideLivePreviewPortal"], // Excluding the edit button from the live preview portal
     },
   });
 }
@@ -85,9 +101,18 @@ export async function getPage(url: string) {
     const entry = result.entries[0]; // Getting the first entry from the result
 
     if (isPreview) {
-      contentstack.Utils.addEditableTags(entry, 'page', true); // Adding editable tags for live preview if enabled
+      contentstack.Utils.addEditableTags(entry, "page", true); // Adding editable tags for live preview if enabled
     }
 
     return entry; // Returning the fetched entry
   }
+}
+
+// Function to fetch all pages for static param generation
+export async function getPages(): Promise<Pick<Page, "url">[]> {
+  const result = await stack.contentType("page").entry().query().find<Page>();
+
+  return (result.entries ?? [])
+    .filter((e) => typeof e.url === "string" && e.url !== "/")
+    .map((e) => ({ url: e.url }));
 }

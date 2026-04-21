@@ -98,6 +98,70 @@ export interface Blocks extends SystemFields {
   block: Block;
 }
 
+// ─── Section block types for the `sections` modular blocks field ───────────
+// Each interface below corresponds to one block type UID in Contentstack.
+// The UID you set in the CMS must match the key checked in SectionRenderer.
+
+export interface HeroBlock {
+  title?: string;
+  description?: string;
+  image?: File | null;
+  /** Single-line text field for the CTA button label */
+  cta_label?: string;
+  /** Single-line text field for the CTA button URL */
+  cta_href?: string;
+  _metadata?: { uid: string };
+  $?: {
+    title?: CSLPFieldMapping;
+    description?: CSLPFieldMapping;
+    image?: CSLPFieldMapping;
+    cta_label?: CSLPFieldMapping;
+    cta_href?: CSLPFieldMapping;
+  };
+}
+
+export interface RichTextBlock {
+  /** Rich text field */
+  content?: string;
+  _metadata?: { uid: string };
+  $?: {
+    content?: CSLPFieldMapping;
+  };
+}
+
+/** Image + text block – same field shape as the existing `Block` type. */
+export type ImageTextBlock = Block;
+
+export interface FeaturesBlock {
+  section_title?: string;
+  /** Modular blocks sub-field; reuses the existing Blocks/Block shape. */
+  cards?: Blocks[];
+  _metadata?: { uid: string };
+  $?: {
+    section_title?: CSLPFieldMapping;
+    cards?: CSLPFieldMapping;
+    [key: string]: CSLPFieldMapping | undefined;
+  };
+}
+
+/**
+ * One item in the `sections` modular blocks field on the `page` content type.
+ * Contentstack sets exactly one block-type key per item.
+ *
+ * Block type UIDs to create in the CMS:
+ *   hero_section        → HeroBlock fields
+ *   rich_text_section   → RichTextBlock fields
+ *   image_text_section  → ImageTextBlock fields (title, copy, image, layout)
+ *   features_section    → FeaturesBlock fields
+ */
+export interface SectionItem {
+  _metadata?: { uid: string };
+  hero_section?: HeroBlock;
+  rich_text_section?: RichTextBlock;
+  image_text_section?: ImageTextBlock;
+  features_section?: FeaturesBlock;
+}
+
 export interface Page extends SystemFields {
   /** UID - required for live preview */
   uid: string;
@@ -115,6 +179,8 @@ export interface Page extends SystemFields {
   rich_text?: string;
   /** blocks */
   blocks?: Blocks[];
+  /** sections – page builder modular blocks */
+  sections?: SectionItem[];
   /** CSLP mapping for editable fields */
   $?: {
     title?: CSLPFieldMapping;
@@ -123,6 +189,7 @@ export interface Page extends SystemFields {
     image?: CSLPFieldMapping;
     rich_text?: CSLPFieldMapping;
     blocks?: CSLPFieldMapping;
+    sections?: CSLPFieldMapping;
     [key: string]: CSLPFieldMapping | undefined; // Allow dynamic block indexing
   };
 }
