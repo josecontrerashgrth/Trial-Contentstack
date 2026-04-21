@@ -32,7 +32,7 @@ export default function BlocksSection({ blocks, containerCslp, getItemCslp }: Bl
                     <div
                         key={block._metadata?.uid ?? `block-${index}`}
                         {...(getItemCslp?.(index) ?? {})}
-                        className={`flex flex-col md:flex-row items-center gap-6 bg-white rounded-xl shadow-sm p-6 ${isImageLeft ? "md:flex-row" : "md:flex-row-reverse"
+                        className={`flex ${isColumn ? "flex-col" : "md:flex-row"} items-center gap-6 bg-white rounded-xl shadow-sm p-6 ${isImageLeft ? "md:flex-row" : "md:flex-row-reverse"
                             }`}
                     >
                         {/* Imagen del bloque */}
