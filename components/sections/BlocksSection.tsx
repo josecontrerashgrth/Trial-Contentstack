@@ -26,6 +26,7 @@ export default function BlocksSection({ blocks, containerCslp, getItemCslp }: Bl
             {blocks?.map((item, index) => {
                 const { block } = item;
                 const isImageLeft = block.layout === "image_left";
+                const isColumn = block.column === "column_true";
 
                 return (
                     <div

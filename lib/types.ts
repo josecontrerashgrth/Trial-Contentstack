@@ -83,6 +83,7 @@ export interface Block {
   image?: File | null;
   /** Layout */
   layout?: ("image_left" | "image_right") | null;
+  column?: ("column_true" | "column_false") | null; // Example of an additional field for layout variations
   /** Metadata */
   _metadata?: { uid: string };
   /** CSLP mapping for editable fields */
