@@ -61,8 +61,10 @@ export default function FeaturesSection({
                             )}
 
                             {block.copy && (
-                                <p className="text-gray-500 text-sm leading-relaxed">
-                                    {block.copy}
+                                <p className="text-gray-500 text-sm leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: block.copy }}
+                                >
+
                                 </p>
                             )}
                         </div>
